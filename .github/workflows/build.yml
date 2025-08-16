@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      # Checkout repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Install system dependencies (Qt6, CMake, compilers, tools)
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential cmake ninja-build \
+            qt6-base-dev qt6-base-dev-tools \
+            qt6-declarative-dev qt6-tools-dev \
+            qt6-tools-dev-tools qt6-quickcontrols2-dev \
+            libgtest-dev clang cppcheck
+
+      # Build GoogleTest (installed as source on Ubuntu)
+      - name: Build GoogleTest
+        run: |
+          cd /usr/src/gtest
+          sudo cmake -B build .
+          sudo cmake --build build
+          sudo cp build/lib/*.a /usr/lib
+
+      # Configure CMake with Ninja
+      - name: Configure CMake
+        run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -G Ninja
+
+      # Build project
+      - name: Build
+        run: cmake --build build
+
+      # Run unit tests (if any)
+      - name: Run tests
+        run: ctest --test-dir build --output-on-failure

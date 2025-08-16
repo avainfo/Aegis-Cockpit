@@ -1,0 +1,51 @@
+flowchart TD
+
+  %% --- NODES PRINCIPAUX ----------------------------------------------------
+  HMI["HMI (Qt/QML 3D)<br/>— UI Thread / MVVM<br/>— Local API Client"]
+
+  APP["AppCore / Gateway<br/>— DDS Client / Bridge<br/>— vSomeIP Client<br/>— Unified Data Model"]
+
+  SRV["Services (vSomeIP, C++)<br/>— VehicleState<br/>— ClusterFeed<br/>— DiagService"]
+
+  DMS["DMS (ROS 2 + DepthAI)<br/>— oakd_node<br/>— mock_node<br/>— /driver_state"]
+
+  SOCKETCAN["SocketCAN"]
+  CAN["CAN Bus<br/>(real / virt.)"]
+
+  SENS["(cameras / sensors)"]
+
+  %% --- LIENS / FLUX --------------------------------------------------------
+  %% Les flèches montent logiquement vers l'HMI (on les dessine du bas vers le haut)
+  SRV -->|vSomeIP| APP
+  DMS -->|DDS intra| APP
+
+  SOCKETCAN --> SRV
+  CAN --> SOCKETCAN
+
+  SENS --> DMS
+
+  APP --> HMI
+
+  %% --- GROUPES VISUELS (facultatif) ---------------------------------------
+  subgraph Top[" "]
+    direction TB
+    HMI
+  end
+
+  subgraph Middle[" "]
+    direction TB
+    APP
+  end
+
+  subgraph BottomLeft[" "]
+    direction TB
+    SRV
+    SOCKETCAN
+    CAN
+  end
+
+  subgraph BottomRight[" "]
+    direction TB
+    DMS
+    SENS
+  end
