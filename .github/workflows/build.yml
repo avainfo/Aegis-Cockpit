@@ -10,6 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-22.04
 
+    env:
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
+      QT_QPA_PLATFORM: offscreen
+
     steps:
       # Checkout repository
       - name: Checkout repository
@@ -20,11 +24,27 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            build-essential cmake ninja-build \
-            qt6-base-dev qt6-base-dev-tools \
-            qt6-declarative-dev qt6-tools-dev \
-            qt6-tools-dev-tools qt6-quickcontrols2-dev \
-            libgtest-dev clang cppcheck
+          build-essential cmake ninja-build \
+          qt6-base-dev qt6-base-dev-tools \
+          qt6-quick3d-dev qt6-shadertools-dev \
+          qt6-declarative-dev qt6-tools-dev qt6-tools-dev-tools \
+          qml6-module-qtquick qml6-module-qtquick-window \
+          qml6-module-qtquick-controls \
+          libgtest-dev clang cppcheck
+
+      - name: Cache ccache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ccache
+          key: ccache-${{ runner.os }}-${{ github.ref }}-${{ github.sha }}
+          restore-keys: |
+            ccache-${{ runner.os }}-${{ github.ref }}
+            ccache-${{ runner.os }}
+
+      - name: Verify dependencies
+        run: |
+          chmod +x scripts/verify.sh
+          ./scripts/verify.sh
 
       # Build GoogleTest (installed as source on Ubuntu)
       - name: Build GoogleTest
@@ -35,8 +55,12 @@ jobs:
           sudo cp build/lib/*.a /usr/lib
 
       # Configure CMake with Ninja
-      - name: Configure CMake
-        run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -G Ninja
+      - name: Configure CMake (Release + ccache)
+        run: |
+          cmake -B build -S . -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
       # Build project
       - name: Build
