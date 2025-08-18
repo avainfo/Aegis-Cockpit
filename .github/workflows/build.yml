@@ -75,8 +75,8 @@ jobs:
           cmake -B build -S src -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
-            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
-            -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR"
+            -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+            -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR}"
 
       - name: Build
         run: cmake --build build --config Release

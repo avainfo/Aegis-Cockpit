@@ -52,3 +52,8 @@ export CMAKE_PREFIX_PATH="$QT_ROOT_DIR:${CMAKE_PREFIX_PATH:-}"
 
 "$QT_ROOT_DIR/bin/qmake6" -v || "$QT_ROOT_DIR/bin/qmake" -v || true
 echo "Qt prefix: $QT_ROOT_DIR"
+
+echo "QT_ROOT_DIR=$QT_PREFIX" >> "$GITHUB_ENV"
+echo "CMAKE_PREFIX_PATH=$QT_PREFIX:${CMAKE_PREFIX_PATH:-}" >> "$GITHUB_ENV"
+echo "QT_QPA_PLATFORM=offscreen" >> "$GITHUB_ENV"
+echo "$QT_PREFIX/bin" >> "$GITHUB_PATH"
