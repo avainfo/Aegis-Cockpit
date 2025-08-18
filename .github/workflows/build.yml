@@ -63,11 +63,16 @@ jobs:
           sudo cmake --build build -j"$(nproc)"
           sudo cp build/lib/*.a /usr/lib
 
+      - name: Install build tools (ccache, cmake, ninja)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ccache cmake ninja-build
+
       - name: Configure CMake (Release + ccache + Ninja)
         run: |
           ccache --zero-stats || true
           ccache --max-size=2G || true
-          cmake -B build -S . -G Ninja \
+          cmake -B build -S src -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
