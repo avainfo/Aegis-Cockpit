@@ -13,7 +13,8 @@ apt install -y \
   libgl1-mesa-dev libglu1-mesa-dev \
   libegl1-mesa-dev libgles2-mesa-dev \
   libx11-dev libxext-dev libxrender-dev libxkbcommon-dev \
-  locales
+  locales \
+  cppcheck
 
 locale-gen C.UTF-8 || true
 export LANG=C.UTF-8
