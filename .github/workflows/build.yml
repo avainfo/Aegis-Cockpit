@@ -11,26 +11,28 @@ jobs:
     runs-on: ubuntu-22.04
 
     env:
-      CMAKE_BUILD_PARALLEL_LEVEL: 4
       QT_QPA_PLATFORM: offscreen
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+      CCACHE_DIR: ~/.cache/ccache
+      CMAKE_BUILD_PARALLEL_LEVEL: 4
 
     steps:
-      # Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # Install system dependencies (Qt6, CMake, compilers, tools)
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-          build-essential cmake ninja-build \
-          qt6-base-dev qt6-base-dev-tools \
-          qt6-quick3d-dev qt6-shadertools-dev \
-          qt6-declarative-dev qt6-tools-dev qt6-tools-dev-tools \
-          qml6-module-qtquick qml6-module-qtquick-window \
-          qml6-module-qtquick-controls \
-          libgtest-dev clang cppcheck
+            build-essential cmake ninja-build ccache \
+            qt6-base-dev qt6-base-dev-tools \
+            qt6-quick3d-dev qt6-shadertools-dev \
+            qt6-declarative-dev qt6-tools-dev qt6-tools-dev-tools \
+            qml6-module-qtquick qml6-module-qtquick-window \
+            qml6-module-qtquick-controls \
+            libgtest-dev clang cppcheck \
+            mesa-utils libgl1-mesa-dri libopengl0 mesa-vulkan-drivers
 
       - name: Cache ccache
         uses: actions/cache@v4
@@ -46,26 +48,53 @@ jobs:
           chmod +x scripts/verify.sh
           ./scripts/verify.sh
 
-      # Build GoogleTest (installed as source on Ubuntu)
-      - name: Build GoogleTest
+      - name: Build GoogleTest (system source)
         run: |
           cd /usr/src/gtest
           sudo cmake -B build .
-          sudo cmake --build build
+          sudo cmake --build build -j$(nproc)
           sudo cp build/lib/*.a /usr/lib
 
-      # Configure CMake with Ninja
-      - name: Configure CMake (Release + ccache)
+      - name: Configure CMake (Release + ccache + Ninja)
         run: |
+          ccache --zero-stats || true
+          ccache --max-size=2G || true
           cmake -B build -S . -G Ninja \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
 
-      # Build project
       - name: Build
-        run: cmake --build build
+        run: cmake --build build --config Release
 
-      # Run unit tests (if any)
       - name: Run tests
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --test-dir build --output-on-failure --build-config Release
+
+      - name: Static analysis (cppcheck)
+        run: |
+          cppcheck --std=c++23 --enable=warning,style,performance,portability \
+                   --inline-suppr --suppress=missingIncludeSystem \
+                   -i build . || true
+
+      - name: Show ccache stats
+        if: always()
+        run: ccache --show-stats || true
+
+      - name: Collect logs on failure
+        if: failure()
+        run: |
+          mkdir -p ci-logs
+          if [ -d build/Testing/Temporary ]; then
+            cp -r build/Testing/Temporary ci-logs/ctest-temp || true
+          fi
+          find build -maxdepth 2 -name "*.log" -exec cp {} ci-logs/ \; || true
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-build
+          path: |
+            build/**
+            ci-logs/**
+          retention-days: 7
