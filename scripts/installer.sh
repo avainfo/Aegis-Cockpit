@@ -23,6 +23,10 @@ export LANG=C.UTF-8
 export LC_ALL=C.UTF-8
 export QT_QPA_PLATFORM=offscreen
 
+QT_BASE="/opt/Qt"
+sudo mkdir -p "$QT_BASE"
+sudo chown "$USER":"$USER" "$QT_BASE"
+
 curl -O https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run
 cat qt-online-installer-linux-x64-online.run | grep -oe "href=\".*\"" | awk -F\" '{system("curl -O " $2)}'
 
@@ -40,6 +44,7 @@ chmod +x qt-online-installer-linux*
   --accept-obligations \
   --default-answer \
   --confirm-command \
+  --root "$QT_BASE" \
   install qt6.9.1-sdk
 
 QT_PREFIX="$(dirname "$(dirname "$(find "$QT_BASE" -type f -name 'Qt6Config.cmake' -print -quit)")")"
