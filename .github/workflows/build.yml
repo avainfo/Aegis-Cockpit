@@ -43,11 +43,24 @@ jobs:
           chmod +x scripts/verify.sh
           ./scripts/verify.sh
 
+      - name: Install GoogleTest sources
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtest-dev
+
       - name: Build GoogleTest (system source)
         run: |
-          cd /usr/src/gtest
-          sudo cmake -B build .
-          sudo cmake --build build -j$(nproc)
+          set -e
+          if [ -d /usr/src/googletest ]; then
+            cd /usr/src/googletest
+          elif [ -d /usr/src/gtest ]; then
+            cd /usr/src/gtest
+          else
+            echo "GoogleTest sources not found under /usr/src" >&2
+            exit 1
+          fi
+          sudo cmake -S . -B build
+          sudo cmake --build build -j"$(nproc)"
           sudo cp build/lib/*.a /usr/lib
 
       - name: Configure CMake (Release + ccache + Ninja)
