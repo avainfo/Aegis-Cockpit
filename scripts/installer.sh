@@ -14,6 +14,7 @@ sudo apt-get install -y \
   libxcb-xinerama0 \
   libxcb-xkb1 \
   libxkbcommon-x11-0 \
+  libxcb-shape0-dev \
   build-essential cmake ninja-build pkg-config \
   libgl1-mesa-dev libglu1-mesa-dev \
   libegl1-mesa-dev libgles2-mesa-dev \
