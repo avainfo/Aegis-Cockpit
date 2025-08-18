@@ -11,9 +11,12 @@ jobs:
     runs-on: ubuntu-22.04
 
     env:
+      # Rendu headless Qt
       QT_QPA_PLATFORM: offscreen
+      # UTF-8 pour éviter les warnings Qt
       LANG: C.UTF-8
       LC_ALL: C.UTF-8
+      # ccache
       CCACHE_DIR: ~/.cache/ccache
       CMAKE_BUILD_PARALLEL_LEVEL: 4
 
@@ -21,18 +24,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
+      # Outils de compilation & rendu software (GL/Vulkan) pour Qt Quick/3D
+      - name: Install build tools & GPU software backend
         run: |
           sudo apt-get update
           sudo apt-get install -y \
             build-essential cmake ninja-build ccache \
-            qt6-base-dev qt6-base-dev-tools \
-            qt6-quick3d-dev qt6-shadertools-dev \
-            qt6-declarative-dev qt6-tools-dev qt6-tools-dev-tools \
-            qml6-module-qtquick qml6-module-qtquick-window \
-            qml6-module-qtquick-controls \
             libgtest-dev clang cppcheck \
             mesa-utils libgl1-mesa-dri libopengl0 mesa-vulkan-drivers
+
+      # Installe Qt 6.9.1 via jurplel/install-qt-action (aqt)
+      - name: Install Qt (6.9.1)
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.9.1'
+          target: 'desktop'
+          modules: 'qtquickcontrols2 qtquick3d'
+          cache: true
+          install-deps: true  # installe les deps Qt manquantes côté apt si nécessaire
 
       - name: Cache ccache
         uses: actions/cache@v4
@@ -43,11 +52,21 @@ jobs:
             ccache-${{ runner.os }}-${{ github.ref }}
             ccache-${{ runner.os }}
 
-      - name: Verify dependencies
+      # Vérif Qt installée (via jurplel) plutôt que dpkg
+      - name: Verify Qt toolchain
+        shell: bash
         run: |
-          chmod +x scripts/verify.sh
-          ./scripts/verify.sh
+          set -euo pipefail
+          echo "QT_ROOT_DIR=${QT_ROOT_DIR}"
+          test -d "${QT_ROOT_DIR}" || (echo "QT_ROOT_DIR missing" && exit 1)
+          "${QT_ROOT_DIR}/bin/qmake6" -v || "${QT_ROOT_DIR}/bin/qmake" -v || true
+          "${QT_ROOT_DIR}/bin/qmlimportscanner" -h >/dev/null
+          test -d "${QT_ROOT_DIR}/qml/QtQuick" || (echo "QtQuick missing" && exit 1)
+          test -d "${QT_ROOT_DIR}/qml/QtQuick/Controls" || (echo "QtQuick Controls2 missing" && exit 1)
+          test -d "${QT_ROOT_DIR}/qml/QtQuick3D" || (echo "QtQuick3D missing" && exit 1)
+          echo "Qt components OK"
 
+      # (Optionnel) Build GoogleTest si tu l'utilises en statique
       - name: Build GoogleTest (system source)
         run: |
           cd /usr/src/gtest
