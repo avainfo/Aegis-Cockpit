@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
 export DEBIAN_FRONTEND=noninteractive
 
 sudo apt-get update
@@ -47,8 +50,12 @@ chmod +x qt-online-installer-linux*
   --root "$QT_BASE" \
   install qt6.9.1-sdk
 
-QT_PREFIX="$(dirname "$(dirname "$(find "$QT_BASE" -type f -name 'Qt6Config.cmake' -print -quit)")")"
-[ -n "$QT_PREFIX" ] || QT_PREFIX="$QT_BASE/6.9.1/gcc_64"
+QT_CFG="$(find "$QT_BASE" -type f -name 'Qt6Config.cmake' -print -quit 2>/dev/null || true)"
+if [ -z "${QT_CFG:-}" ]; then
+  echo "::error:: Qt6Config.cmake introuvable sous $QT_BASE. L'installation a probablement échoué."
+  exit 1
+fi
+QT_PREFIX="$(dirname "$(dirname "$QT_CFG")")"
 
 export QT_QPA_PLATFORM=offscreen
 export QT_ROOT_DIR="$QT_PREFIX"

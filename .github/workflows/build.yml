@@ -76,7 +76,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_C_COMPILER_LAUNCHER=ccache \
             -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-            -DCMAKE_PREFIX_PATH="${QT_ROOT_DIR}"
+            -DCMAKE_PREFIX_PATH="${CMAKE_PREFIX_PATH}"
 
       - name: Build
         run: cmake --build build --config Release
@@ -112,3 +112,10 @@ jobs:
             build/**
             ci-logs/**
           retention-days: 7
+
+      - name: Debug Qt env
+        run: |
+          echo "QT_ROOT_DIR=$QT_ROOT_DIR"
+          echo "CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH"
+          which qmake6 || true
+          test -n "$QT_ROOT_DIR" && ls -l "$QT_ROOT_DIR/lib/cmake/Qt6/Qt6Config.cmake" || true
