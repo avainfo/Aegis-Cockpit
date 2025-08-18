@@ -1,5 +1,7 @@
-apt update
-apt install -y \
+export DEBIAN_FRONTEND=noninteractive
+
+sudo apt-get update
+sudo apt-get install -y \
   curl \
   synaptic \
   libxcb-icccm4 \
@@ -19,6 +21,7 @@ apt install -y \
 locale-gen C.UTF-8 || true
 export LANG=C.UTF-8
 export LC_ALL=C.UTF-8
+export QT_QPA_PLATFORM=offscreen
 
 curl -O https://download.qt.io/official_releases/online_installers/qt-online-installer-linux-x64-online.run
 cat qt-online-installer-linux-x64-online.run | grep -oe "href=\".*\"" | awk -F\" '{system("curl -O " $2)}'

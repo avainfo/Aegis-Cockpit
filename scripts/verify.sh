@@ -24,20 +24,17 @@ ninja_v=$(ninja --version)
 ver_ge "$cmake_v" "3.21" && ok "cmake >= 3.21 (found $cmake_v)" || err "cmake >= 3.21 required (found $cmake_v)"
 ver_ge "$ninja_v" "1.10" && ok "ninja >= 1.10 (found $ninja_v)" || err "ninja >= 1.10 required (found $ninja_v)"
 
-echo -e "\n== Qt6 packages =="
-check_pkg() {
-  dpkg -s "$1" &>/dev/null && ok "$1" || err "$1"
-}
-check_pkg qt6-base-dev
-check_pkg qt6-base-dev-tools
-check_pkg qt6-quick3d-dev
-check_pkg qt6-shadertools-dev
-check_pkg qt6-declarative-dev
-check_pkg qt6-tools-dev
-check_pkg qt6-tools-dev-tools
-check_pkg qml6-module-qtquick
-check_pkg qml6-module-qtquick-window
-check_pkg qml6-module-qtquick-controls
+echo -e "\n== Qt6 Install =="
+if [ -n "${QT_ROOT_DIR:-}" ] && [ -d "$QT_ROOT_DIR" ]; then
+  [ -f "$QT_ROOT_DIR/lib/cmake/Qt6/Qt6Config.cmake" ] && ok "Qt6Config.cmake" || err "Qt6Config.cmake"
+  [ -x "$QT_ROOT_DIR/bin/qmake6" ] && ok "qmake6" || err "qmake6"
+  [ -d "$QT_ROOT_DIR/qml/QtQuick" ] && ok "QtQuick" || err "QtQuick"
+  [ -d "$QT_ROOT_DIR/qml/QtQuick/Controls" ] && ok "QtQuick Controls2" || err "QtQuick Controls2"
+  [ -d "$QT_ROOT_DIR/qml/QtQuick3D" ] && ok "QtQuick3D" || err "QtQuick3D"
+else
+  err "QT_ROOT_DIR non défini"
+fi
+
 
 echo -e "\n== GTest & cppcheck =="
 dpkg -s libgtest-dev &>/dev/null && ok "libgtest-dev" || err "libgtest-dev"
