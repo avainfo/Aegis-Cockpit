@@ -8,14 +8,27 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 6.9 REQUIRED COMPONENTS Quick QuickControls2)
+find_package(Qt6 6.9 REQUIRED COMPONENTS Quick QuickControls2 Qml)
+
+qt_policy(SET QTP0001 NEW)
 
 qt_add_executable(AegisCockpit
-        main.cpp
+	main.cpp
+)
+
+qt_add_qml_module(
+	AegisCockpit
+	URI Aegis
+	VERSION 0.1.0
+	QML_FILES
+		Main.qml
+		qml/SpeedText.qml
+	RESOURCES assets/outline.png
 )
 
 target_link_libraries(AegisCockpit
-        PRIVATE
-        Qt6::Quick
-        Qt6::QuickControls2
+	PRIVATE
+	Qt6::Quick
+	Qt6::QuickControls2
+	Qt6::Qml
 )
