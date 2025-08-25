@@ -29,7 +29,15 @@ qt_add_qml_module(
 	QML_FILES
 	Main.qml
 	qml/SpeedText.qml
-	RESOURCES assets/outline.png
+	RESOURCES
+	assets/outline.png
+	SOURCES
+	hmi/include/ModeType.hpp
+	hmi/src/ModeType.cpp
+)
+
+target_include_directories(AegisCockpit PRIVATE
+	${CMAKE_CURRENT_SOURCE_DIR}/hmi/include
 )
 
 target_link_libraries(AegisCockpit

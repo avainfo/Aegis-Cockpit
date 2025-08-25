@@ -7,6 +7,7 @@
 #include <QLoggingCategory>
 
 #include "core/VehicleState.hpp"
+#include "hmi/include/ModeType.hpp"
 #include "ui/FpsCounter.hpp"
 
 using namespace Qt::StringLiterals;
@@ -28,13 +29,12 @@ int main(int argc, char *argv[]) {
 	engine.rootContext()->setContextProperty("vehicle", &vehicle);
 	engine.rootContext()->setContextProperty("fps", &fps);
 
-	engine.load(QUrl(u"qrc:/qt/qml/Aegis/Main.qml"_s));
+	engine.load(QStringLiteral("qrc:/qt/qml/Aegis/Main.qml"));
 	if (engine.rootObjects().isEmpty()) return 1;
 
 	const auto *win = qobject_cast<QQuickWindow *>(engine.rootObjects().first());
 	if (win)
 		fps.attach(win);
-	fps.attach(win);
 
 	QTimer timer(&app);
 	timer.setInterval(500);

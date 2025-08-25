@@ -1,6 +1,6 @@
 import QtQuick
 import QtQuick.Window
-import Aegis 0.1
+import Aegis 0.1 as Aegis
 
 Window {
     id: win
@@ -36,6 +36,7 @@ Window {
             accent: "#1E1E1E"
             anchors.centerIn: parent
             fontSize: 42
+            mode: Aegis.ModeType.Eco
             value: vehicle.speed
         }
     }

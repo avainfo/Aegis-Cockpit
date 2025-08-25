@@ -1,10 +1,12 @@
 import QtQuick
+import Aegis 0.1 as Aegis
 
 Rectangle {
     id: root
 
     property color accent: "#FFFFFF"
     property int fontSize: 28
+    property int mode: Aegis.ModeType.Eco
     property real value: 0
 
     height: sub.height
@@ -12,8 +14,8 @@ Rectangle {
 
     Behavior on value {
         NumberAnimation {
-            duration: 800
-            easing.type: Easing.InOutQuad
+            duration: (root.mode === Aegis.ModeType.Sport) ? 250 : (root.mode === Aegis.ModeType.Comfort) ? 400 : 800
+            easing.type: Easing.OutCubic
         }
     }
 
