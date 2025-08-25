@@ -4,7 +4,7 @@ import Aegis 0.1 as Aegis
 Rectangle {
     id: root
 
-    property color accent: "#FFFFFF"
+    property string accent: "#FFFFFF"
     property int fontSize: 28
     property int mode: Aegis.ModeType.Eco
     property real value: 0
