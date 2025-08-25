@@ -1,13 +1,23 @@
 import QtQuick
 import QtQuick.Window
-import Aegis
+import Aegis 0.1
 
 Window {
+    id: win
+
     color: "#1E1E1E"
     title: qsTr("Aegis")
     visibility: Window.Maximized
     visible: true
 
+    Text {
+        anchors.right: parent.right
+        anchors.top: parent.top
+        color: "white"
+        opacity: 0.7
+        padding: 6
+        text: `FPS: ${fps ? fps.fps : 0}`
+    }
     Rectangle {
         color: "white"
         height: img.height
@@ -26,7 +36,7 @@ Window {
             accent: "#1E1E1E"
             anchors.centerIn: parent
             fontSize: 42
-            value: 0
+            value: vehicle.speed
         }
     }
 }

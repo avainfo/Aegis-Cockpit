@@ -8,12 +8,18 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+add_compile_options(-Wall -Wextra -Wpedantic)
+
 find_package(Qt6 6.9 REQUIRED COMPONENTS Quick QuickControls2 Qml)
 
 qt_policy(SET QTP0001 NEW)
+qt_policy(SET QTP0004 NEW)
 
 qt_add_executable(AegisCockpit
 	main.cpp
+	core/VehicleState.cpp
+	ui/FpsCounter.cpp
+	ui/FpsCounter.hpp
 )
 
 qt_add_qml_module(
@@ -21,8 +27,8 @@ qt_add_qml_module(
 	URI Aegis
 	VERSION 0.1.0
 	QML_FILES
-		Main.qml
-		qml/SpeedText.qml
+	Main.qml
+	qml/SpeedText.qml
 	RESOURCES assets/outline.png
 )
 

@@ -27,9 +27,4 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         text: Math.round(root.value).toString()
     }
-    MouseArea {
-        anchors.fill: parent
-
-        onClicked: root.value += 37
-    }
 }
