@@ -16,7 +16,7 @@ Window {
         color: "white"
         opacity: 0.7
         padding: 6
-        text: `FPS: ${fps ? fps.fps : 0}`
+        text: "FPS: " + (Aegis.Fps ? Aegis.Fps.fps : 0)
     }
     Rectangle {
         color: "white"
@@ -29,6 +29,11 @@ Window {
 
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
+        cache: true
+        fillMode: Image.PreserveAspectFit
+        layer.enabled: false
+        layer.mipmap: true
+        mipmap: false
         source: "qrc:/qt/qml/Aegis/assets/outline.png"
         width: parent.width
 
@@ -37,7 +42,7 @@ Window {
             anchors.centerIn: parent
             fontSize: 42
             mode: Aegis.ModeType.Eco
-            value: vehicle.speed
+            value: Aegis.Vehicle.speed
         }
     }
 }

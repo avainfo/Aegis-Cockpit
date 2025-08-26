@@ -8,6 +8,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+set(QT_QML_GENERATE_QMLTYPES ON)
+
 add_compile_options(-Wall -Wextra -Wpedantic)
 
 find_package(Qt6 6.9 REQUIRED COMPONENTS Quick QuickControls2 Qml)
@@ -20,20 +22,20 @@ qt_add_executable(AegisCockpit
 	core/VehicleState.cpp
 	ui/FpsCounter.cpp
 	ui/FpsCounter.hpp
+	hmi/src/ModeType.cpp
+	hmi/include/ModeType.hpp
 )
 
 qt_add_qml_module(
 	AegisCockpit
 	URI Aegis
 	VERSION 0.1.0
+	OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Aegis
 	QML_FILES
-	Main.qml
-	qml/SpeedText.qml
+	  Main.qml
+	  qml/SpeedText.qml
 	RESOURCES
-	assets/outline.png
-	SOURCES
-	hmi/include/ModeType.hpp
-	hmi/src/ModeType.cpp
+	  assets/outline.png
 )
 
 target_include_directories(AegisCockpit PRIVATE

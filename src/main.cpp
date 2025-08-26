@@ -5,6 +5,7 @@
 #include <QTimer>
 #include <QQuickStyle>
 #include <QLoggingCategory>
+#include <QtQml/qqml.h>
 
 #include "core/VehicleState.hpp"
 #include "hmi/include/ModeType.hpp"
@@ -26,8 +27,16 @@ int main(int argc, char *argv[]) {
 	VehicleState vehicle;
 	FpsCounter fps(&app);
 
-	engine.rootContext()->setContextProperty("vehicle", &vehicle);
-	engine.rootContext()->setContextProperty("fps", &fps);
+	// qmlRegisterUncreatableMetaObject(
+	// 	ModeType::staticMetaObject,
+	// 	"Aegis", 0, 1,
+	// 	"ModeType",
+	// 	"Enum only"
+	// );
+
+	qmlRegisterUncreatableType<ModeType>("Aegis", 0, 1, "ModeType", "Enum only");
+	qmlRegisterSingletonInstance<VehicleState>("Aegis", 0, 1, "Vehicle", &vehicle);
+	qmlRegisterSingletonInstance<FpsCounter>("Aegis", 0, 1, "Fps", &fps);
 
 	engine.load(QStringLiteral("qrc:/qt/qml/Aegis/Main.qml"));
 	if (engine.rootObjects().isEmpty()) return 1;
